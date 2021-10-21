@@ -37,7 +37,7 @@ function CrearGasto(descripcion, valor, fecha, ...etiquetas) {
     }
 
     this.etiquetas = [];
-    
+
     this.anyadirEtiquetas = function (...etiquetas) {
         let pos;
         for (let etiqueta of etiquetas) {
@@ -48,10 +48,10 @@ function CrearGasto(descripcion, valor, fecha, ...etiquetas) {
         }
     }
     this.anyadirEtiquetas(...etiquetas);
-    
+
 
     this.mostrarGasto = function () {
-        
+
         return `Gasto correspondiente a ${this.descripcion} con valor ${this.valor} €`
     }
 
@@ -81,7 +81,7 @@ function CrearGasto(descripcion, valor, fecha, ...etiquetas) {
         }
     }
 
-    
+
 
     this.borrarEtiquetas = function (...etiquetas) {
         let pos;
@@ -93,22 +93,22 @@ function CrearGasto(descripcion, valor, fecha, ...etiquetas) {
         }
     }
 
-    this.obtenerPeriodoAgrupacion= function (periodo){
+    this.obtenerPeriodoAgrupacion = function (periodo) {
         let date = new Date(this.fecha);
         let textoFecha = date.toISOString();
-        let periodoAgrupacion ="";
-        
-        switch (periodo){
+        let periodoAgrupacion = "";
+
+        switch (periodo) {
             case "dia":
-                periodoAgrupacion=textoFecha.substring(0,10);
+                periodoAgrupacion = textoFecha.substring(0, 10);
                 return periodoAgrupacion;
                 break;
             case "mes":
-                periodoAgrupacion=textoFecha.substring(0,7);
+                periodoAgrupacion = textoFecha.substring(0, 7);
                 return periodoAgrupacion;
                 break;
             case "anyo":
-                periodoAgrupacion=textoFecha.substring(0,4);
+                periodoAgrupacion = textoFecha.substring(0, 4);
                 return periodoAgrupacion;
                 break;
 
@@ -149,7 +149,149 @@ function calcularBalance() {
     return balance;
 }
 
-function filtrarGastos() {}
+function filtrarGastos({
+    fechaDesde,
+    fechaHasta,
+    valorMinimo,
+    valorMaximo,
+    descripcionContiene,
+    etiquetasTiene
+}) {
+    let filtrados = [];
+    if (!fechaDesde && !fechaHasta && !valorMinimo && !valorMaximo && !descripcionContiene && !etiquetasTiene) {
+        filtrados = gastos;
+    }
+    if (fechaDesde) {
+        let fD = Date.parse(fechaDesde);
+        filtrados = gastos.filter(item => item.fecha >= fD);
+    }
+    if (fechaHasta) {
+        let fH = Date.parse(fechaHasta);
+        if (filtrados.length == 0) {
+            filtrados = gastos.filter(item => item.fecha <= fH);
+        } else {
+            let i = 0;
+            do {
+                if (fH < filtrados[i].fecha) {
+                    let pos = i;
+                    filtrados.splice(pos, 1);
+                } else {
+                    i++;
+                }
+            } while (i < filtrados.length);
+        }
+    }
+    if (valorMinimo) {
+        if (filtrados.length > 0) {
+            let i = 0;
+            do {
+                if (valorMinimo > filtrados[i].valor) {
+                    let pos = i;
+                    filtrados.splice(pos, 1);
+                } else {
+                    i++;
+                }
+            } while (i < filtrados.length);
+
+        } else if (filtrados.length == 0) {
+            filtrados = gastos.filter(item => item.valor >= valorMinimo);
+        }
+    }
+
+    if (valorMaximo) {
+
+        if (filtrados.length > 0) {
+            let i = 0;
+            do {
+                if (filtrados[i].valor > valorMaximo) {
+                    let pos = i;
+                    filtrados.splice(pos, 1);
+                } else {
+                    i++;
+                }
+            } while (i < filtrados.length);
+        }
+        if (filtrados.length == 0) {
+            filtrados = gastos.filter(item => item.valor <= valorMaximo);
+        }
+    }
+
+    if (descripcionContiene) {
+        if (filtrados.length > 0) {
+            let i = 0;
+            do {
+                let incluye = filtrados[i].descripcion.includes(descripcionContiene);
+                if (!incluye) {
+                    let pos = i;
+                    filtrados.splice(pos, 1);
+                } else {
+                    i++;
+                }
+            } while (i < filtrados.length);
+        }
+        if (filtrados.length == 0) {
+            for (let gasto of gastos) {
+                let incluye = gasto.descripcion.includes(descripcionContiene);
+                if (incluye) {
+                    filtrados.push(gasto);
+                }
+            }
+
+        }
+    }
+
+    if (etiquetasTiene) {
+        if (filtrados.length > 0) {
+            let i = 0;
+
+            let existe = false;
+            let pos=-1;
+            for (i = 0; i < filtrados.length; i++) {
+                if (pos >= 0) {
+                    i=0;
+                }
+                let j = 0;
+                do {
+                    let etiq = etiquetasTiene[j];
+                    existe = filtrados[i].etiquetas.includes(etiq);
+                    j++;
+                } while (!existe && j < etiquetasTiene.length);
+                if (!existe) {
+                    pos = i;
+                    filtrados.splice(pos, 1);
+                }
+            }
+
+
+
+        }
+        //TODO pendiente ver si duplica gastos en filtrados(si el gasto tiene 2 etiquetas de la busqueda)
+        if (filtrados.length == 0) {
+            for (let etiq of etiquetasTiene) {
+                let contieneEtiq;
+                let contieneId;
+                for (let gasto of gastos) {
+                    contieneEtiq = gasto.etiquetas.includes(etiq);
+                    if (contieneEtiq) {
+                        let idG = gasto.id;
+                        let i = 0;
+                        let pos = filtrados.findIndex(item => item.id === idG);
+                        if (pos == -1) {
+                            filtrados.push(gasto);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+    return filtrados;
+}
+
 function agruparGastos() {}
 // NO MODIFICAR A PARTIR DE AQUÍ: exportación de funciones y objetos creados para poder ejecutar los tests.
 // Las funciones y objetos deben tener los nombres que se indican en el enunciado
