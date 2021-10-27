@@ -245,10 +245,10 @@ function filtrarGastos({
             let i = 0;
 
             let existe = false;
-            let pos=-1;
+            let pos = -1;
             for (i = 0; i < filtrados.length; i++) {
                 if (pos >= 0) {
-                    i=0;
+                    i = 0;
                 }
                 let j = 0;
                 do {
@@ -265,7 +265,7 @@ function filtrarGastos({
 
 
         }
-        //TODO pendiente ver si duplica gastos en filtrados(si el gasto tiene 2 etiquetas de la busqueda)
+
         if (filtrados.length == 0) {
             for (let etiq of etiquetasTiene) {
                 let contieneEtiq;
@@ -292,7 +292,39 @@ function filtrarGastos({
     return filtrados;
 }
 
-function agruparGastos() {}
+function agruparGastos(periodo, etiquetas, fechaDesde, fechaHasta) {
+
+    if (!periodo) {
+        periodo = "mes";
+    }
+    
+    if (!fechaHasta) {
+        let date = new Date();
+        let feH = date.toISOString();
+        fechaHasta = feH.substring(0, 10);
+    }
+    let gastosFiltrados = filtrarGastos({
+        fechaDesde,
+        fechaHasta,
+        etiquetas
+    });
+
+    function groupBy(objectArray, property) {
+        return objectArray.reduce(function (acc, obj) {
+            var key = obj[property];
+            if (!acc[key]) {
+                acc[key] = [];
+            }
+            acc[key].push(obj);
+            return acc;
+        }, {});
+    }
+    let resultado = groupBy(gastosFiltrados, periodo);
+    return resultado;
+}
+
+
+
 // NO MODIFICAR A PARTIR DE AQUÍ: exportación de funciones y objetos creados para poder ejecutar los tests.
 // Las funciones y objetos deben tener los nombres que se indican en el enunciado
 // Si al obtener el código de una práctica se genera un conflicto, por favor incluye todo el código que aparece aquí debajo
