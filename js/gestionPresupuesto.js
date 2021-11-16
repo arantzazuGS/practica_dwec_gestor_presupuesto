@@ -292,34 +292,23 @@ function filtrarGastos({
     return filtrados;
 }
 
-function agruparGastos(periodo, etiquetas, fechaDesde, fechaHasta) {
+function agruparGastos(periodo = "mes", etiquetas, fechaDesde, fechaHasta = new Date(Date.now()).toISOString().substring(0,10)){
 
-    let etiquetasTiene = etiquetas;
-
-    if (!fechaDesde)
-    {
-        fechaDesde = "2000-01-01";
+    let filtro = {
+        etiquetasTiene: etiquetas,
+        fechaDesde: fechaDesde,
+        fechaHasta: fechaHasta
     }
 
-    if (!fechaHasta)
-    {
-        fechaHasta = new Date(Date.now()).toISOString().substr(0,10);
-    }
+    let gastosFiltro = filtrarGastos(filtro);
 
-    let grupoGastos = filtrarGastos({fechaDesde, fechaHasta, etiquetasTiene})
-
-
-    let resultado = grupoGastos.reduce((acc, grupo) => { 
-        
-        acc[grupo.obtenerPeriodoAgrupacion(periodo)] = (acc[grupo.obtenerPeriodoAgrupacion(periodo)] || 0) + grupo.valor; 
-        
+    /*let gastosAgrupar = gastosFiltro.reduce((acc, gasto) => {
+        acc[gasto.obtenerPeriodoAgrupacion(periodo)] = (acc[gasto.obtenerPeriodoAgrupacion(periodo)] || 0) + gasto.valor;
         return acc;
-    
-    } , {});
-        
-    
-    return resultado;
-}
+    },{});
+
+    return gastosAgrupar;*/
+    }
 // NO MODIFICAR A PARTIR DE AQUÍ: exportación de funciones y objetos creados para poder ejecutar los tests.
 // Las funciones y objetos deben tener los nombres que se indican en el enunciado
 // Si al obtener el código de una práctica se genera un conflicto, por favor incluye todo el código que aparece aquí debajo
