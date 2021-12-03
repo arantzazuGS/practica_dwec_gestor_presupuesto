@@ -1,8 +1,11 @@
+
+
 import * as gesPres from "./gestionPresupuesto.js";
 import * as gesPresWeb from "./gestionPresupuestoWeb.js";
 
 
 gesPres.actualizarPresupuesto(1500);
+
 gesPresWeb.mostrarDatoEnId("presupuesto", gesPres.mostrarPresupuesto());
 
 let gastos = [];
@@ -74,3 +77,4 @@ gesPresWeb.mostrarGastosAgrupadosWeb("agrupacion-mes", gastosAgrupados2, "mes");
 let periodo3= "anyo";
 let gastosAgrupados3= gesPres.agruparGastos(periodo3);
 gesPresWeb.mostrarGastosAgrupadosWeb("agrupacion-anyo", gastosAgrupados3, "año");
+
