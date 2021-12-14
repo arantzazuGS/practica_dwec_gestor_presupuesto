@@ -8,8 +8,12 @@ let btAnyadirGastoFormulario = document.getElementById("anyadirgasto-formulario"
 btAct.addEventListener("click", actualizarPresupuestoWeb);
 btAny.addEventListener("click", nuevoGastoWeb);
 
+
 let manejadorCrearForm = new NuevoGastoWebFormulario();
 btAnyadirGastoFormulario.addEventListener("click", manejadorCrearForm);
+
+
+
 
 function mostrarDatoEnId(idElemento, valor) {
     let div = document.getElementById(idElemento);
@@ -33,7 +37,7 @@ function mostrarGastoWeb(idElemento, gasto) {
     let divGasFecha = document.createElement('div');
     divGasFecha.className = 'gasto-fecha';
     divGasto.append(divGasFecha);
-    divGasFecha.textContent = `${gasto.fecha}`;
+    divGasFecha.textContent = `${new Date(gasto.fecha).toISOString()}`;
 
     let divGasValor = document.createElement('div');
     divGasValor.className = 'gasto-valor';
@@ -247,7 +251,7 @@ function EnviarNuevoGastoHandleForm() {
         e.preventDefault();
         let descr = document.getElementById("descripcion").value;
         let valor = document.getElementById("valor").value;
-        valor=parseFloat(valor);
+        valor = parseFloat(valor);
         let fecha = document.getElementById("fecha").value;
         let etiquetas = document.getElementById("etiquetas").value;
         etiquetas = etiquetas.split(",");
@@ -346,6 +350,46 @@ function CancelHandleForm() {
 
 
     }
+}
+
+//Regexp
+let formFiltrado = document.getElementById("formulario-filtrado");
+let manejadorFiltrado= new filtrarGastosWeb();
+formFiltrado.addEventListener("submit", manejadorFiltrado);
+
+function filtrarGastosWeb() {
+    this.handleEvent = function (e) {
+        e.preventDefault();
+
+        let descrip = formFiltrado.elements["formulario-filtrado-descripcion"].value;
+        let valMin = formFiltrado.elements["formulario-filtrado-valor-minimo"].value;
+        let valMax = formFiltrado.elements["formulario-filtrado-valor-maximo"].value;
+        let fechaDesd = formFiltrado.elements["formulario-filtrado-fecha-desde"].value;
+        let fechaHast = formFiltrado.elements["formulario-filtrado-fecha-hasta"].value;
+
+        let etiquets = formFiltrado.elements["formulario-filtrado-etiquetas-tiene"].value;
+        if (etiquets != "") {
+            var etiquValidas = gesPres.transformarListadoEtiquetas(etiquets);
+        }
+
+        let filtro = {
+            fechaDesde: fechaDesd,
+            fechaHasta: fechaHast,
+            valorMinimo: valMin,
+            valorMaximo: valMax,
+            descripcionContiene: descrip,
+            etiquetasTiene: etiquValidas
+        };
+        let filtrado = gesPres.filtrarGastos(filtro);
+        document.getElementById("listado-gastos-completo").innerHTML = "";
+        for (let g of filtrado) {
+            mostrarGastoWeb("listado-gastos-completo", g);
+        }
+
+    }
+
+
+
 }
 export {
     mostrarDatoEnId,
