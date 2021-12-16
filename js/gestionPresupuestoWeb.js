@@ -388,8 +388,39 @@ function filtrarGastosWeb() {
 
     }
 
+}
 
 
+let btGuardarGastos= document.getElementById("guardar-gastos");
+let manGuardarGastos = new guardarGastosWeb();
+btGuardarGastos.addEventListener("click", manGuardarGastos);
+
+let btCargarGastos = document.getElementById("cargar-gastos");
+let manCargarGastos = new cargarGastosWeb();
+btCargarGastos.addEventListener("click", manCargarGastos);
+
+function guardarGastosWeb(){
+    this.handleEvent = function (e) {
+        let listaGastos = gesPres.listarGastos();
+        localStorage.setItem('GestorGastosDWEC',JSON.stringify(listaGastos));
+
+    }
+}
+
+function cargarGastosWeb() {
+    this.handleEvent = function (e) {
+        let listaGastosGuardados= localStorage.getItem('GestorGastosDWEC');
+        listaGastosGuardados= JSON.parse(listaGastosGuardados);
+        if(!listaGastosGuardados){
+            let arrayVacio=[];
+            gesPres.cargarGastos(arrayVacio);
+        }else{
+             
+            gesPres.cargarGastos(listaGastosGuardados);
+        }
+        
+        repintar();
+    }
 }
 export {
     mostrarDatoEnId,

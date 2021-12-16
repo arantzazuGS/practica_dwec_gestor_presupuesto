@@ -327,6 +327,14 @@ function transformarListadoEtiquetas(texto){
     return arrayEtiq;
 }
 
+//Almacenamiento en navegador:
+
+function cargarGastos(arrayGastos){
+    gastos.length=0;
+    gastos=arrayGastos;
+
+}
+
     
 
 // NO MODIFICAR A PARTIR DE AQUÍ: exportación de funciones y objetos creados para poder ejecutar los tests.
@@ -343,5 +351,6 @@ export {
     calcularBalance,
     filtrarGastos,
     agruparGastos,
-    transformarListadoEtiquetas
+    transformarListadoEtiquetas,
+    cargarGastos
 }
